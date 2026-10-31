@@ -12,8 +12,9 @@
 <path d="M26 24l16 8-16 8z" fill="#fff" opacity=".0"/><circle cx="50" cy="14" r="4" fill="#fff"/><path d="M50 8v12M44 14h12" stroke="#fff" stroke-width="1.5"/></symbol></defs></svg>
 
 <nav><div class="brand"><svg width="38" height="38"><use href="#logo"/></svg><span>Sumit Glimpses</span></div>
-<div><a class="k" href="index.html">← Client site</a><a class="k hide" id="out" href="#">Logout</a></div></nav>
-<section id="login"><div class="portal" style="text-align:center"><h2>🛠 Admin login</h2><p class="sub">Only Sumit can sign in here.</p><button class="btn" id="gl">Sign in with Google</button><p class="msg" id="lmsg"></p></div></section>
+<div><a class="k" href="index.html">← Client site</a><a class="k hide" id="out" href="#">Lock &amp; logout</a></div></nav>
+<section id="gate"><div class="portal" style="text-align:center"><h2>🔒 Admin locked</h2><p class="sub">Enter the admin password.</p><input id="pw" type="password" placeholder="Password" autocomplete="off" style="max-width:320px;text-align:center"><br><button class="btn" id="ug" style="margin-top:8px">Unlock</button><p class="msg" id="gmsg"></p></div></section>
+<section id="login" class="hide"><div class="portal" style="text-align:center"><h2>🛠 Admin login</h2><p class="sub">Only Sumit can sign in here.</p><button class="btn" id="gl">Sign in with Google</button><p class="msg" id="lmsg"></p></div></section>
 <section id="panel" class="hide"><div class="portal">
 <h2>🛠 Admin — Sumit only</h2><p class="sub">Add a video, set your own price, approve payments.</p>
 <div class="row"><input id="an" placeholder="Client name"><input id="ap" type="number" min="1" placeholder="Price ₹"><input id="af" type="file" accept="video/*"></div>

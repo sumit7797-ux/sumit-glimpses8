@@ -1,10 +1,22 @@
 function gen(){return 'GLM-'+Math.floor(1000+Math.random()*9000)}
 $('gl').onclick=()=>firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>{$('lmsg').textContent='Login failed: '+e.message});
-$('out').onclick=e=>{e.preventDefault();firebase.auth().signOut()};
-let started=false;
-firebase.auth().onAuthStateChanged(u=>{
- if(u&&u.email===ADMIN_EMAIL){$('login').classList.add('hide');$('panel').classList.remove('hide');$('out').classList.remove('hide');if(!started){started=true;loadAdmin();loadSampleList()}}
- else{$('panel').classList.add('hide');$('login').classList.remove('hide');$('out').classList.add('hide');$('lmsg').textContent=u?'This account ('+u.email+') is not the admin.':''}});
+const PW_HASH="4ff8958e685fc32dc7fcdcfd12c102eff43cb1b4f00fad91006ffecb9bedf611";
+async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+let unlocked=sessionStorage.getItem('gl_ok')==='1',tries=0,until=0,authUser=null,started=false;
+function refresh(){const ok=authUser&&authUser.email===ADMIN_EMAIL;
+ $('gate').classList.toggle('hide',unlocked);
+ $('login').classList.toggle('hide',!unlocked||!!ok);
+ $('panel').classList.toggle('hide',!(unlocked&&ok));
+ $('out').classList.toggle('hide',!unlocked);
+ $('lmsg').textContent=authUser&&!ok?'This account ('+authUser.email+') is not the admin.':'';
+ if(unlocked&&ok&&!started){started=true;loadAdmin();loadSampleList()}}
+async function unlock(){if(Date.now()<until){$('gmsg').textContent='Too many wrong tries. Wait 30 seconds.';return}
+ if(!window.crypto||!crypto.subtle){$('gmsg').textContent='Open this page over https (your GitHub link).';return}
+ if(await sha($('pw').value)===PW_HASH){unlocked=true;sessionStorage.setItem('gl_ok','1');$('pw').value='';$('gmsg').textContent='';refresh()}
+ else{tries++;$('gmsg').textContent='Wrong password.';if(tries>=5){until=Date.now()+30000;tries=0}}}
+$('ug').onclick=unlock;$('pw').onkeydown=e=>{if(e.key==='Enter')unlock()};
+$('out').onclick=async e=>{e.preventDefault();sessionStorage.removeItem('gl_ok');try{await firebase.auth().signOut()}catch(x){}location.reload()};
+firebase.auth().onAuthStateChanged(u=>{authUser=u;refresh()});
 $('add').onclick=async()=>{const f=$('af').files[0],n=$('an').value.trim(),p=+$('ap').value;if(!f||!n||!p){$('amsg').textContent='Fill name, price and choose a video.';return}
 $('amsg').textContent='Uploading…';
 try{const r=await assets.upload(f);const c=gen();await db.collection('orders').doc(c).set({client:n,price:p,url:r.url,paid:false,title:'Video for '+n,at:Date.now()});
